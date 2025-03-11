@@ -84,7 +84,7 @@ activity.addEventListener(('change'), (e) => {
 });
 
 //Create variable referencing the <select> element
-const payments = document.getElementById('payment');
+const payments = document.getElementById('payment');``
 
 //Create variable referencing the <div> element of "credit card"
 const card = document.getElementById('credit-card');
@@ -130,7 +130,9 @@ form.addEventListener('submit', (e) => {
     //If Name is invalid, show error and prevent form submission
     if (!isValidName) {
         isValid = false;
-      //  alert("Name field cannot be blank.");
+        const newSpan = document.getElementById("name-hint");
+        newSpan.style.display = "block";
+        //alert("Name field cannot be blank.");
     };
 
     //Validate the Email field validation (similar structure)
@@ -141,7 +143,9 @@ form.addEventListener('submit', (e) => {
     
     if (!isValidEmail) {
         isValid = false;
-      //  alert("Please enter a valid email.");
+        const newSpan = document.getElementById("email-hint");
+        newSpan.style.display = "block";
+        //alert("Please enter a valid email.");
     };
 
     // Validate Activities (at least one checkbox selected)
@@ -149,16 +153,17 @@ form.addEventListener('submit', (e) => {
 
     if (selectedActivities.length === 0) {
         isValid = false;
-       // alert("Please select at least one activity.");
+        const newSpan = document.getElementById("activities-hint");
+        newSpan.style.display = "block";
+        //alert("Please select at least one activity.");
     };
 
     //Validate Credit Card Number (only if selected payment is "credit card")
-    if (cardNum.value === "") {
+    if (cardNum.value === "" && payments.value === 'credit-card') {
         const cardNumValue = cardNum.value.trim();
         // Regex for 13 or 16-digit card number
         const cardNumRegex = /^\d{13,16}$/;
-        const isValidCard = cardNumRegex.test(cardNumValue);
-                
+        const isValidCard = cardNumRegex.test(cardNumValue);     
 
         if (!isValidCard) {
             isValid = false;
@@ -218,14 +223,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const emailInput = document.getElementById('email');
     const activitiesFieldset = document.getElementById('activities-box');
     const activityCheckboxes = document.querySelectorAll('#activities-box input[type="checkbox"]');
-    const paymentInput = document.getElementById('credit-card')
-
+    const paymentInput = document.getElementById('cc-num');
+    const zipInput = document.getElementById('zip');
+    const cvvInput = document.getElementById('cvv');
+    
+    
     // Helper function to show validation error
     function showValidationError(element) {
     const parent = element.parentElement;
     parent.classList.add('not-valid');
     parent.classList.remove('valid');
-    //parent.lastElementChild.style.display = "block";
+    parent.lastElementChild.style.display = "block";
     }
 
     // Helper function to show valid state
@@ -271,11 +279,12 @@ function validateEmail() {
         }
     }
 
-    //Credit card vaildation function
-    function validateCreditCard() {
+    //Card number vaildation function
+    function validateCardNumber() {
         const cardPattern = /^\d{13,16}$/;
         if (!cardPattern.test(paymentInput.value)) {
             showValidationError(paymentInput);
+            
             return false;           
         } else {
             showValidState(paymentInput);
@@ -283,7 +292,29 @@ function validateEmail() {
         }
     }
 
+    //Zip validation function
+    function validateZip() {
+        const zipPattern = /^\d{5}$/;
+        if(!zipPattern.test(zipInput.value)) {
+            showValidationError(zipInput);
+            return false;
+        } else {
+            showValidState(zipInput);
+            return true;
+        }
+    }
 
+    //CVV validation function
+    function validateCVV() {
+        const cvvPattern = /^\d{3}$/;
+        if(!cvvPattern.test(cvvInput.value)) {
+            showValidationError(cvvInput);
+            return false;
+        } else {
+            showValidState(cvvInput);
+            return true;
+        }
+    }
 
     // Validate form on submission
     form.addEventListener('submit', (e) => {
@@ -292,10 +323,11 @@ function validateEmail() {
         if (!validateName()) isFormValid = false;
         if (!validateEmail()) isFormValid = false;
         if (!validateActivities()) isFormValid = false;
-        if (paymentInput.value === "credit-card"){
-            if (!validateCreditCard()) isFormValid = false;
+        if (payments.value === "credit-card"){
+            if (!validateCardNumber()) isFormValid = false;
+            if(!validateZip()) isFormValid = false;
+            if(!validateCVV()) isFormValid = false;
         }
-
         // Prevent form submission if any validation fails
         if (!isFormValid) {
             e.preventDefault();
@@ -310,5 +342,7 @@ function validateEmail() {
     nameInput.addEventListener('input', validateName);
     emailInput.addEventListener('input', validateEmail);
     activityCheckboxes.forEach(checkbox => checkbox.addEventListener('change', validateActivities));
-    paymentInput.addEventListener('blur', validateCreditCard);
+    paymentInput.addEventListener('input', validateCardNumber);
+    zipInput.addEventListener('input', validateZip);
+    cvvInput.addEventListener('input', validateCVV);
 });
