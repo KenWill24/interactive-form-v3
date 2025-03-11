@@ -284,7 +284,6 @@ function validateEmail() {
         const cardPattern = /^\d{13,16}$/;
         if (!cardPattern.test(paymentInput.value)) {
             showValidationError(paymentInput);
-            
             return false;           
         } else {
             showValidState(paymentInput);
